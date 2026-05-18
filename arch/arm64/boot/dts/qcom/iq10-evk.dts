@@ -521,6 +521,34 @@
 	status = "okay";
 };
 
+&remoteproc_cdsp0 {
+	firmware-name = "qcom/iq10/cdsp.mbn",
+			"qcom/iq10/cdsp_dtbs.elf";
+
+	status = "okay";
+};
+
+&remoteproc_cdsp1 {
+	firmware-name = "qcom/iq10/cdsp1.mbn",
+			"qcom/iq10/cdsp1_dtbs.elf";
+
+	status = "okay";
+};
+
+&remoteproc_cdsp2 {
+	firmware-name = "qcom/iq10/cdsp2.mbn",
+			"qcom/iq10/cdsp2_dtbs.elf";
+
+	status = "okay";
+};
+
+&remoteproc_cdsp3 {
+	firmware-name = "qcom/iq10/cdsp3.mbn",
+			"qcom/iq10/cdsp3_dtbs.elf";
+
+	status = "okay";
+};
+
 &uart15 {
 	status = "okay";
 };

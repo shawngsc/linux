@@ -36,6 +36,8 @@ properties:
       - sdsp
       - cdsp
       - cdsp1
+      - cdsp2
+      - cdsp3
       - gdsp0
       - gdsp1
 

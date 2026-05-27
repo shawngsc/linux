@@ -40,6 +40,7 @@
 
 #define HIGH_BITS_MASK 0xFFFFFFFF00000000ULL
 
+static DEFINE_MUTEX(rproc_boot_mutex);
 static DEFINE_MUTEX(rproc_list_mutex);
 static LIST_HEAD(rproc_list);
 static struct notifier_block rproc_panic_nb;
@@ -1946,6 +1947,8 @@ int rproc_boot(struct rproc *rproc)
 		release_firmware(firmware_p);
 	}
 
+	mutex_unlock(&rproc_boot_mutex);
+
 downref_rproc:
 	if (ret)
 		atomic_dec(&rproc->power);
@@ -2296,6 +2299,8 @@ int rproc_add(struct rproc *rproc)
 		put_device(dev);
 		goto rproc_remove_cdev;
 	}
+
+	mutex_lock(&rproc_boot_mutex);
 
 	dev_info(dev, "%s is available\n", rproc->name);
 

@@ -2254,7 +2254,7 @@
 					compatible = "qcom,nord-fastrpc",
 						     "qcom,kaanapali-fastrpc";
 					qcom,glink-channels = "fastrpcglink-apps-dsp";
-					label = "cdsp0";
+					label = "cdsp";
 					#address-cells = <1>;
 					#size-cells = <0>;
 

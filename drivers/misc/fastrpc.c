@@ -2551,8 +2551,9 @@ static int fastrpc_rpmsg_callback(struct rpmsg_device *rpdev, void *data,
 	spin_unlock_irqrestore(&cctx->lock, flags);
 
 	if (!ctx) {
-		dev_err(&rpdev->dev, "No context ID matches response\n");
-		return -ENOENT;
+		dev_info(&rpdev->dev, "No context ID matches response, ctx = 0x%llx\n",
+			rsp->ctx);
+		return 0;
 	}
 
 	ctx->retval = rsp->retval;

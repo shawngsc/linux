@@ -22,6 +22,7 @@
 #include <linux/firmware/qcom/qcom_scm.h>
 #include <uapi/misc/fastrpc.h>
 #include <linux/of_reserved_mem.h>
+#include <linux/sizes.h>
 #include <linux/bits.h>
 
 #define ADSP_DOMAIN_ID (0)
@@ -39,9 +40,16 @@
 #define FASTRPC_DSP_UTILITIES_HANDLE	2
 #define FASTRPC_CTXID_MASK (0xFF0000)
 #define FASTRPC_CTXID_SHIFT 16
-#define INIT_FILELEN_MAX (2 * 1024 * 1024)
+#define INIT_FILELEN_MAX (5 * 1024 * 1024)
 #define INIT_FILE_NAMELEN_MAX (128)
 #define FASTRPC_DEVICE_NAME	"fastrpc"
+
+/* TEMP DEBUG: toggle whether the process-create init page carries the
+ * consolidated SID offset (sid << sid_pos). Default keeps existing behaviour.
+ * Set fastrpc.create_page_strip_sid=1 to send the raw IOVA instead.
+ */
+static bool create_page_strip_sid;
+module_param(create_page_strip_sid, bool, 0644);
 
 /* Add memory to static PD pool, protection thru XPU */
 #define ADSP_MMAP_HEAP_ADDR  4
@@ -1535,7 +1543,16 @@ static int fastrpc_init_create_process(struct fastrpc_user *fl,
 	args[2].fd = init.filefd;
 
 	pages[0].addr = imem->dma_addr;
+	if (create_page_strip_sid)
+		pages[0].addr = fastrpc_ipa_to_dma_addr(fl->cctx, imem->dma_addr);
 	pages[0].size = imem->size;
+
+	/* TEMP DEBUG: correlate with DSP diag "mapping_create failed for addr" */
+	dev_info(fl->sctx->dev,
+		 "fastrpc create: sid=%u client_id=%d pd=%d attrs=0x%x memlen=%d filelen=%u strip_sid=%d init_mem addr=%pad size=0x%llx base_iova=0x%llx\n",
+		 fl->sctx->sid, fl->client_id, fl->pd, inbuf.attrs, memlen,
+		 inbuf.filelen, create_page_strip_sid, &pages[0].addr, (u64)pages[0].size,
+		 (u64)fastrpc_ipa_to_dma_addr(fl->cctx, imem->dma_addr));
 
 	args[3].ptr = (u64)(uintptr_t) pages;
 	args[3].length = 1 * sizeof(*pages);
@@ -2264,11 +2281,22 @@ static int fastrpc_cb_probe(struct platform_device *pdev)
 		}
 	}
 	spin_unlock_irqrestore(&cctx->lock, flags);
-	rc = dma_set_mask(dev, DMA_BIT_MASK(dma_bits));
+	rc = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(dma_bits));
 	if (rc) {
 		dev_err(dev, "%u-bit DMA enable failed\n", dma_bits);
 		return rc;
 	}
+
+	/*
+	 * TEMP DEBUG: the dma-iommu allocator packs IOVAs at the top of the
+	 * window (dma_limit). On CDSP the DSP maps the process shell at
+	 * (sid << 56 | iova); if the IOVA sits at the very top of the 34-bit
+	 * window the shell mapping crosses the aperture ceiling and the DSP
+	 * rejects it ("object too big"). Cap the window below the ceiling so
+	 * top-packed allocations keep headroom.
+	 */
+	if (cctx->domain_id == CDSP_DOMAIN_ID)
+		dev->bus_dma_limit = DMA_BIT_MASK(dma_bits) - SZ_256M;
 
 	return 0;
 }

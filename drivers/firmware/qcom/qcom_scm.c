@@ -2420,10 +2420,10 @@ static void qcom_scm_qtee_init(struct qcom_scm *scm)
 	/*
 	 * Probe for smcinvoke support. This will fail due to invalid buffers,
 	 * but first, it checks whether the call is supported in QTEE syscall
-	 * handler. If it is not supported, -EIO is returned.
+	 * handler. If it is not supported, -EIO or -EINVAL is returned.
 	 */
 	ret = qcom_scm_qtee_invoke_smc(0, 0, 0, 0, &result, &response_type);
-	if (ret == -EIO)
+	if (ret == -EIO || ret == -EINVAL)
 		return;
 
 	/* Setup QTEE interface device. */

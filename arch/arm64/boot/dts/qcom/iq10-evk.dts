@@ -51,6 +51,13 @@
 			clock-div = <2>;
 		};
 	};
+
+	firmware {
+		optee {
+			compatible = "linaro,optee-tz";
+			method = "smc";
+		};
+	};
 };
 
 &apps_rsc {

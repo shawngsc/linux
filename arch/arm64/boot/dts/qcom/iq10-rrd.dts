@@ -558,8 +558,8 @@
 };
 
 &remoteproc_adsp {
-	firmware-name = "qcom/nord/adsp.mbn",
-			"qcom/nord/adsp_dtbs.elf";
+	firmware-name = "qcom/nord/adsp_computelite.mbn",
+			"qcom/nord/adsp_computelite_dtbs.elf";
 
 	status = "okay";
 };

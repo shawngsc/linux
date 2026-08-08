@@ -8,9 +8,9 @@
 struct qcom_glink_smem;
 
 #if IS_ENABLED(CONFIG_RPMSG_QCOM_GLINK)
-void qcom_glink_ssr_notify(const char *ssr_name);
+void qcom_glink_ssr_notify(const char *ssr_name, void *cluster);
 #else
-static inline void qcom_glink_ssr_notify(const char *ssr_name) {}
+static inline void qcom_glink_ssr_notify(const char *ssr_name, void *cluster) {}
 #endif
 
 #if IS_ENABLED(CONFIG_RPMSG_QCOM_GLINK_SMEM)

@@ -233,8 +233,9 @@ static void glink_subdev_stop(struct rproc_subdev *subdev, bool crashed)
 static void glink_subdev_unprepare(struct rproc_subdev *subdev)
 {
 	struct qcom_rproc_glink *glink = to_glink_subdev(subdev);
+	struct rproc *rproc = container_of(glink->dev, struct rproc, dev);
 
-	qcom_glink_ssr_notify(glink->ssr_name);
+	qcom_glink_ssr_notify(glink->ssr_name, rproc->cluster);
 }
 
 /**

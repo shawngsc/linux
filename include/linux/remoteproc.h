@@ -281,6 +281,8 @@ enum rproc_features {
  * @cdev: character device of the rproc
  * @cdev_put_on_release: flag to indicate if remoteproc should be shutdown on @char_dev release
  * @features: indicate remoteproc features
+ * @cluster: opaque identifier shared by remoteprocs whose SSR notifications
+ *	     should be coalesced (set by the owning rproc driver), or NULL
  */
 struct rproc {
 	struct list_head node;
@@ -326,6 +328,7 @@ struct rproc {
 	struct cdev cdev;
 	bool cdev_put_on_release;
 	DECLARE_BITMAP(features, RPROC_MAX_FEATURES);
+	void *cluster;
 };
 
 /**

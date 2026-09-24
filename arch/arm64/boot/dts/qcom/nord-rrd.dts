@@ -257,7 +257,6 @@
 			};
 		};
 	};
->>>>>>> 7993e568e1f7 (FROMLIST: arm64: dts: qcom: nord-rrd: Add WCN7850 WLAN support)
 };
 
 &apps_rsc {
